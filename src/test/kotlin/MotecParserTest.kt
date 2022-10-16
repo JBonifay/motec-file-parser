@@ -6,27 +6,28 @@ import org.junit.jupiter.api.assertDoesNotThrow
 class MotecParserTest {
 
     private val motecParser = MotecParser()
+    private val fileName = "sample.ld"
 
     @Test
     fun shouldFailIfFileDoesNotExist() {
         assertThrows(IllegalStateException::class.java, {
             val file = "fileDoesNotExist.ld"
-            motecParser.parseHeader(file)
+            motecParser.parseFile(file)
         }, "Could not open file!")
     }
 
     @Test
     fun shouldNotThrowIfFileWasFound() {
-        val file = "sample.ld"
         assertDoesNotThrow {
-            motecParser.parseHeader(file)
+            motecParser.parseFile(fileName)
         }
     }
 
     @Test
     fun shouldParseHeader() {
-        val file = "sample.ld"
-        val header = motecParser.parseHeader(file)
+        motecParser.parseFile(fileName)
+        val header = motecParser.header
+
         assertEquals(64, header.ldmarker)
         assertEquals(0, header.unknown1)
         assertEquals(13384, header.channel_meta_ptr)
@@ -59,5 +60,24 @@ class MotecParserTest {
         assertEquals("22S2-GTSPRINT-Sebring-Lambo-DE.sto", header.short_comment)
         assertEquals(126, header.unknown11.size)
     }
-    
+
+    @Test
+    fun shouldParseEvent() {
+        motecParser.parseFile(fileName)
+        val event = motecParser.event
+
+        kotlin.test.assertEquals("Test", event.name)
+        kotlin.test.assertEquals("Test", event.session)
+        kotlin.test.assertEquals("\nTime of day: 7:00 pm", event.comment)
+        kotlin.test.assertEquals(4918, event.venue_addr)
+    }
+
+    @Test
+    fun shouldParseVenue() {
+        motecParser.parseFile(fileName)
+        val venue = motecParser.venue
+        assertEquals("barcelona gp", venue.name)
+        assertEquals(1034, venue.unknown1.size)
+        assertEquals(8020, venue.vehicle_addr)
+    }
 }
