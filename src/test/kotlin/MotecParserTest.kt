@@ -3,6 +3,7 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertDoesNotThrow
+import java.io.FileNotFoundException
 
 class MotecParserTest {
 
@@ -11,10 +12,10 @@ class MotecParserTest {
 
     @Test
     fun shouldFailIfFileDoesNotExist() {
-        assertThrows(IllegalStateException::class.java, {
+        assertThrows(FileNotFoundException::class.java) {
             val file = "fileDoesNotExist.ld"
             motecParser.parseFile(file)
-        }, "Could not open file!")
+        }
     }
 
     @Test
@@ -122,5 +123,12 @@ class MotecParserTest {
         assertEquals("bar", channelOne.short_name)
         assertEquals("", channelOne.unit)
         assertEquals(40, channelOne.unknown2.size)
+    }
+
+    @Test
+    fun shouldParseChannelData() {
+        motecParser.parseFile(fileName)
+        val channelOne = motecParser.channels[0]
+        assertEquals(6420, channelOne.data.size)
     }
 }

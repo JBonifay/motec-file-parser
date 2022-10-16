@@ -17,4 +17,6 @@ data class Channel(
     val unit: String,
     val unknown2: ByteArray
 
-)
+) {
+    val data = mutableListOf<Any>()
+}

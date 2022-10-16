@@ -1,3 +1,10 @@
+import Datatype.BEACON16
+import Datatype.BEACON32
+import Datatype.F16
+import Datatype.F32
+import Datatype.I16
+import Datatype.I32
+import Datatype.INVALID
 import java.io.File
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
@@ -19,6 +26,7 @@ class MotecParser() {
         venue = parseVenue(buffer)
         vehicle = parseVehicle(buffer)
         channels = parseChannels(buffer)
+        parseChannelsData(buffer)
     }
 
     private fun createBuffer(fileName: String): ByteBuffer {
@@ -133,6 +141,22 @@ class MotecParser() {
             readString(12, buffer),
             readBytes(40, buffer)
         )
+    }
+
+    private fun parseChannelsData(buffer: ByteBuffer) {
+        for (channel in channels) {
+            buffer.position(channel.data_addr)
+
+            for (i in 0 until channel.data_count) {
+                when (channel.datatype) {
+                    BEACON16, I16 -> channel.data.add(buffer.getShort())
+                    BEACON32, I32 -> channel.data.add(buffer.getInt())
+                    F16 -> TODO()
+                    F32 -> channel.data.add(buffer.getFloat())
+                    INVALID -> TODO()
+                }
+            }
+        }
     }
 
     private fun readBytes(size: Int, bb: ByteBuffer): ByteArray {
