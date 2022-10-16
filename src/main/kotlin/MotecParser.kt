@@ -9,6 +9,7 @@ class MotecParser() {
     lateinit var event: Event
     lateinit var venue: Venue
     lateinit var vehicle: Vehicle
+    lateinit var channels: MutableList<Channel>
 
     fun parseFile(fileName: String) {
         val buffer = createBuffer(fileName)
@@ -17,6 +18,7 @@ class MotecParser() {
         event = parseEvent(buffer)
         venue = parseVenue(buffer)
         vehicle = parseVehicle(buffer)
+        channels = parseChannels(buffer)
     }
 
     private fun createBuffer(fileName: String): ByteBuffer {
@@ -89,6 +91,47 @@ class MotecParser() {
             buffer.getInt(),
             readString(32, buffer),
             readString(32, buffer)
+        )
+    }
+
+    private fun parseChannels(buffer: ByteBuffer): MutableList<Channel> {
+        val channels = mutableListOf<Channel>()
+        var addr = header.channel_meta_ptr
+        while (addr != 0) {
+            val channel = parseChannel(buffer, addr)
+            addr = channel.next_addr
+            channels.add(channel)
+        }
+        return channels
+    }
+
+    private fun parseChannel(buffer: ByteBuffer, addr: Int): Channel {
+        buffer.position(addr)
+        val prev_addr = buffer.getInt()
+        val next_addr = buffer.getInt()
+        val data_addr = buffer.getInt()
+        val data_count = buffer.getInt()
+        val unknown1 = buffer.getShort()
+        val datatype_type = buffer.getShort()
+        val datatype_size = buffer.getShort()
+        return Channel(
+            prev_addr,
+            next_addr,
+            data_addr,
+            data_count,
+            unknown1,
+            datatype_type,
+            datatype_size,
+            Datatype.fromTypeAndSize(datatype_type, datatype_size),
+            buffer.getShort(),
+            buffer.getShort(),
+            buffer.getShort(),
+            buffer.getShort(),
+            buffer.getShort(),
+            readString(32, buffer),
+            readString(8, buffer),
+            readString(12, buffer),
+            readBytes(40, buffer)
         )
     }
 

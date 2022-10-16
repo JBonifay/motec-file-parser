@@ -1,3 +1,4 @@
+import Datatype.I32
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Test
@@ -90,5 +91,36 @@ class MotecParserTest {
         assertEquals(0, vehicle.weight)
         assertEquals("Car", vehicle.type)
         assertEquals("", vehicle.comment)
+    }
+
+    @Test
+    fun shouldParseChannels() {
+        motecParser.parseFile(fileName)
+        val channels = motecParser.channels
+        assertEquals(330, channels.size)
+    }
+
+    @Test
+    fun shouldParseChannelOneByOne() {
+        motecParser.parseFile(fileName)
+        val channelOne = motecParser.channels[0]
+        assertEquals(0, channelOne.prev_addr)
+        assertEquals(13508, channelOne.next_addr)
+        assertEquals(54304, channelOne.data_addr)
+        assertEquals(6420, channelOne.data_count)
+        assertEquals(6420, channelOne.data_count)
+        assertEquals(3, channelOne.unknown1)
+        assertEquals(5, channelOne.datatype_type)
+        assertEquals(4, channelOne.datatype_size)
+        assertEquals(I32, channelOne.datatype)
+        assertEquals(60, channelOne.sample_rate)
+        assertEquals(0, channelOne.offset)
+        assertEquals(1, channelOne.mul)
+        assertEquals(1, channelOne.scale)
+        assertEquals(8, channelOne.dec_places)
+        assertEquals("Manifold Pres", channelOne.name)
+        assertEquals("bar", channelOne.short_name)
+        assertEquals("", channelOne.unit)
+        assertEquals(40, channelOne.unknown2.size)
     }
 }
