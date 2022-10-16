@@ -22,7 +22,7 @@ class MotecParser() {
     }
 
     private fun createBuffer(fileName: String): ByteBuffer {
-        val file = openFile(fileName)
+        val file = File(fileName)
         return ByteBuffer.wrap(file.readBytes()).order(ByteOrder.LITTLE_ENDIAN)
     }
 
@@ -133,14 +133,6 @@ class MotecParser() {
             readString(12, buffer),
             readBytes(40, buffer)
         )
-    }
-
-    private fun openFile(fileName: String): File {
-        val url = this::class.java.getResource(fileName)
-        val file = File(
-            url?.toURI() ?: throw IllegalStateException("Could not open file!")
-        )
-        return file
     }
 
     private fun readBytes(size: Int, bb: ByteBuffer): ByteArray {
