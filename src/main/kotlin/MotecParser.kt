@@ -8,6 +8,7 @@ class MotecParser() {
     lateinit var header: Header
     lateinit var event: Event
     lateinit var venue: Venue
+    lateinit var vehicle: Vehicle
 
     fun parseFile(fileName: String) {
         val buffer = createBuffer(fileName)
@@ -15,6 +16,12 @@ class MotecParser() {
         header = parseHeader(buffer)
         event = parseEvent(buffer)
         venue = parseVenue(buffer)
+        vehicle = parseVehicle(buffer)
+    }
+
+    private fun createBuffer(fileName: String): ByteBuffer {
+        val file = openFile(fileName)
+        return ByteBuffer.wrap(file.readBytes()).order(ByteOrder.LITTLE_ENDIAN)
     }
 
     private fun parseHeader(buffer: ByteBuffer) = Header(
@@ -22,9 +29,9 @@ class MotecParser() {
         buffer.getInt(),
         buffer.getInt(),
         buffer.getInt(),
-        readArray(20, buffer),
+        readBytes(20, buffer),
         buffer.getInt(),
-        readArray(24, buffer),
+        readBytes(24, buffer),
         buffer.getShort(),
         buffer.getShort(),
         buffer.getShort(),
@@ -35,20 +42,20 @@ class MotecParser() {
         buffer.getInt(),
         buffer.getInt(),
         readString(16, buffer),
-        readArray(16, buffer),
+        readBytes(16, buffer),
         readString(16, buffer),
-        readArray(16, buffer),
+        readBytes(16, buffer),
         readString(64, buffer),
         readString(64, buffer),
-        readArray(64, buffer),
+        readBytes(64, buffer),
         readString(64, buffer),
-        readArray(64, buffer),
-        readArray(1024, buffer),
+        readBytes(64, buffer),
+        readBytes(1024, buffer),
         buffer.getInt(),
-        readArray(2, buffer),
+        readBytes(2, buffer),
         readString(64, buffer),
         readString(64, buffer),
-        readArray(126, buffer)
+        readBytes(126, buffer)
     )
 
     private fun parseEvent(buffer: ByteBuffer): Event {
@@ -69,14 +76,20 @@ class MotecParser() {
         buffer.position(event.venue_addr.toInt())
         return Venue(
             readString(64, buffer),
-            readArray(1034, buffer),
+            readBytes(1034, buffer),
             buffer.getShort()
         )
     }
 
-    private fun createBuffer(fileName: String): ByteBuffer {
-        val file = openFile(fileName)
-        return ByteBuffer.wrap(file.readBytes()).order(ByteOrder.LITTLE_ENDIAN)
+    private fun parseVehicle(buffer: ByteBuffer): Vehicle {
+        buffer.position(venue.vehicle_addr.toInt())
+        return Vehicle(
+            readString(64, buffer),
+            readBytes(128, buffer),
+            buffer.getInt(),
+            readString(32, buffer),
+            readString(32, buffer)
+        )
     }
 
     private fun openFile(fileName: String): File {
@@ -87,7 +100,7 @@ class MotecParser() {
         return file
     }
 
-    private fun readArray(size: Int, bb: ByteBuffer): ByteArray {
+    private fun readBytes(size: Int, bb: ByteBuffer): ByteArray {
         val tmp = ByteArray(size)
         bb.get(tmp)
         return tmp

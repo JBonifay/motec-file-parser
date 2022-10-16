@@ -80,4 +80,15 @@ class MotecParserTest {
         assertEquals(1034, venue.unknown1.size)
         assertEquals(8020, venue.vehicle_addr)
     }
+
+    @Test
+    fun shouldParseVehicle() {
+        motecParser.parseFile(fileName)
+        val vehicle = motecParser.vehicle
+        assertEquals("lamborghinievogt3", vehicle.id)
+        assertEquals(128, vehicle.unknown1.size)
+        assertEquals(0, vehicle.weight)
+        assertEquals("Car", vehicle.type)
+        assertEquals("", vehicle.comment)
+    }
 }
