@@ -1,3 +1,3 @@
 
-rootProject.name = "motec_file_parser"
+rootProject.name = "motec-parser"
 
