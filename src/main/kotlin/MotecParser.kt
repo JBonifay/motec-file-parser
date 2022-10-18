@@ -10,7 +10,7 @@ import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.nio.charset.StandardCharsets
 
-class MotecParser() {
+class MotecParser {
 
     lateinit var header: Header
     lateinit var event: Event
