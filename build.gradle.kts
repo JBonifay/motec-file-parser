@@ -6,7 +6,7 @@ plugins {
     `java-library`
 }
 
-group = "com.joffrey"
+group = "io.github.jbonifay"
 version = "1.0"
 
 repositories {
