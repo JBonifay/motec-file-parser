@@ -11,7 +11,7 @@ plugins {
 }
 
 group = "io.github.jbonifay"
-version = "1.1-SNAPSHOT"
+version = "1.1"
 
 repositories {
     mavenCentral()
@@ -35,7 +35,7 @@ tasks.test {
 
 nexusPublishing {
     repositories {
-        sonatype { // only for users registered in Sonatype after 24 Feb 2021
+        sonatype {
             nexusUrl.set(uri("https://s01.oss.sonatype.org/service/local/"))
             snapshotRepositoryUrl.set(uri("https://s01.oss.sonatype.org/content/repositories/snapshots/"))
         }
@@ -45,12 +45,6 @@ nexusPublishing {
 publishing {
     publications {
         create<MavenPublication>("mavenJava") {
-            signing {
-                val GPG_SIGNING_KEY = System.getenv("GPG_SIGNING_KEY")
-                val GPG_SIGNING_KEY_PWD = System.getenv("GPG_SIGNING_KEY_PWD")
-                useInMemoryPgpKeys(GPG_SIGNING_KEY, GPG_SIGNING_KEY_PWD)
-                sign(publishing.publications["mavenJava"])
-            }
             from(components["java"])
             pom {
                 name.set("motec-parser")
@@ -58,8 +52,8 @@ publishing {
                 url.set("https://github.com/JBonifay/motec-file-parser")
                 licenses {
                     license {
-                        name.set("Apache License 2.0")
-                        url.set("https://github.com/JBonifay/motec-file-parser/blob/main/LICENSE")
+                        name.set("The Apache License, Version 2.0")
+                        url.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
                     }
                 }
                 developers {
@@ -77,15 +71,11 @@ publishing {
             }
         }
     }
+}
 
-    nexusPublishing {
-        repositories {
-            create("myNexus") {
-                nexusUrl.set(uri("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"))
-                snapshotRepositoryUrl.set(uri("https://s01.oss.sonatype.org/content/repositories/snapshots/"))
-                username.set(System.getenv("NEXUS_USERNAME"))
-                password.set(System.getenv("NEXUS_PASSWORD"))
-            }
-        }
-    }
+signing {
+    val signinKey = System.getenv("ORG_GRADLE_PROJECT_signingKey")
+    val signinKeyPwd = System.getenv("ORG_GRADLE_PROJECT_signingPassword")
+    useInMemoryPgpKeys(signinKey, signinKeyPwd)
+    sign(*publishing.publications.toTypedArray())
 }
