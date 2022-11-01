@@ -6,8 +6,6 @@ plugins {
     kotlin("jvm") version "1.7.20"
     `maven-publish`
     `java-library`
-    signing
-    id("io.github.gradle-nexus.publish-plugin") version "1.1.0"
 }
 
 group = "io.github.jbonifay"
@@ -33,49 +31,21 @@ tasks.test {
     }
 }
 
-nexusPublishing {
-    repositories {
-        sonatype {
-            nexusUrl.set(uri("https://s01.oss.sonatype.org/service/local/"))
-            snapshotRepositoryUrl.set(uri("https://s01.oss.sonatype.org/content/repositories/snapshots/"))
-        }
-    }
-}
-
 publishing {
-    publications {
-        create<MavenPublication>("mavenJava") {
-            from(components["java"])
-            pom {
-                name.set("motec-parser")
-                description.set("Kotlin parser for Motec files")
-                url.set("https://github.com/JBonifay/motec-file-parser")
-                licenses {
-                    license {
-                        name.set("The Apache License, Version 2.0")
-                        url.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
-                    }
-                }
-                developers {
-                    developer {
-                        id.set("JoffreyB")
-                        name.set("Joffrey Bonifay")
-                        email.set("joffreybonifay83@gmail.com")
-                    }
-                }
-                scm {
-                    connection.set("scm:git:https://github.com/JBonifay/motec-file-parser.git")
-                    developerConnection.set("scm:git@github.com:JBonifay/motec-file-parser.git")
-                    url.set("https://github.com/JBonifay/motec-file-parser")
-                }
+    repositories {
+        maven {
+            name = "GitHubPackages"
+            url = uri("https://maven.pkg.github.com/JBonifay/motec-file-parser")
+            credentials {
+                username = project.findProperty("gpr.user") as String? ?: System.getenv("GITHUB_USERNAME")
+                password = project.findProperty("gpr.key") as String? ?: System.getenv("GITHUB_TOKEN")
             }
         }
     }
-}
-
-signing {
-    val signinKey = System.getenv("ORG_GRADLE_PROJECT_signingKey")
-    val signinKeyPwd = System.getenv("ORG_GRADLE_PROJECT_signingPassword")
-    useInMemoryPgpKeys(signinKey, signinKeyPwd)
-    sign(*publishing.publications.toTypedArray())
+    publications {
+        create<MavenPublication>("gpr") {
+            from(components["java"])
+        }
+        }
+      
 }
