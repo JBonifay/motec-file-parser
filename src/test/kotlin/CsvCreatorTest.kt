@@ -3,14 +3,14 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import java.io.ByteArrayOutputStream
 
-class CsrCreatorTest {
+class CsvCreatorTest {
 
     @Test
     fun shouldInsertHeaderWithChannelNames() {
-        val channels = listOf(
-            createFakeChannel("Brake"),
-            createFakeChannel("AirTemp"),
-            createFakeChannel("AirDensity")
+        val channels = linkedMapOf(
+            "Brake" to createFakeChannel("Brake"),
+            "AirTemp" to createFakeChannel("AirTemp"),
+            "AirDensity" to createFakeChannel("AirDensity")
         )
         val csvResult = ByteArrayOutputStream().apply { writeCsv(channels) }.toByteArray().let { String(it) }
 
@@ -22,8 +22,8 @@ class CsrCreatorTest {
 
     @Test
     fun shouldInsertValueForOneChannel() {
-        val channels = listOf(
-            createFakeChannel("Brake", 10)
+        val channels = linkedMapOf(
+            "Brake" to createFakeChannel("Brake", 10)
         )
 
         val csvResult = ByteArrayOutputStream().apply { writeCsv(channels) }.toByteArray().let { String(it) }
@@ -36,9 +36,9 @@ class CsrCreatorTest {
 
     @Test
     fun shouldInsertOneValueForTwoChannels() {
-        val channels = listOf(
-            createFakeChannel("Brake", 10),
-            createFakeChannel("Gaz", 20)
+        val channels = linkedMapOf(
+            "Brake" to createFakeChannel("Brake", 10),
+            "Gaz" to createFakeChannel("Gaz", 20)
         )
 
         val csvResult = ByteArrayOutputStream().apply { writeCsv(channels) }.toByteArray().let { String(it) }
@@ -51,9 +51,9 @@ class CsrCreatorTest {
 
     @Test
     fun shouldInsertThreeValueForTwoChannels() {
-        val channels = listOf(
-            createFakeChannel("Brake", 10, 20, 30),
-            createFakeChannel("Gaz", 40, 50, 60)
+        val channels = linkedMapOf(
+            "Brake" to createFakeChannel("Brake", 10, 20, 30),
+            "Gaz" to createFakeChannel("Gaz", 40, 50, 60)
         )
 
         val csvResult = ByteArrayOutputStream().apply { writeCsv(channels) }.toByteArray().let { String(it) }
@@ -71,9 +71,9 @@ class CsrCreatorTest {
 
     @Test
     fun shouldInsertValueForChannelsWithDataOfDifferentSize() {
-        val channels = listOf(
-            createFakeChannel("Brake", 10),
-            createFakeChannel("Gaz", 40, 50, 60)
+        val channels = linkedMapOf(
+            "Brake" to createFakeChannel("Brake", 10),
+            "Gaz" to createFakeChannel("Gaz", 40, 50, 60)
         )
 
         val csvResult = ByteArrayOutputStream().apply { writeCsv(channels) }.toByteArray().let { String(it) }

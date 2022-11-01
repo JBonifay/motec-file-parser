@@ -1,7 +1,7 @@
 import java.io.BufferedWriter
-import java.io.OutputStream // ktlint-disable filename
+import java.io.OutputStream
 
-fun OutputStream.writeCsv(channels: List<Channel>) {
+fun OutputStream.writeCsv(channels: LinkedHashMap<String, Channel>) {
     val writer = bufferedWriter()
 
     writeHeader(channels, writer)
@@ -11,10 +11,10 @@ fun OutputStream.writeCsv(channels: List<Channel>) {
     writer.flush()
 }
 
-private fun writeHeader(channels: List<Channel>, writer: BufferedWriter) {
+private fun writeHeader(channels: LinkedHashMap<String, Channel>, writer: BufferedWriter) {
     val sb = StringBuilder()
     sb.append("Sample,")
-    channels.forEachIndexed { index, it ->
+    channels.values.forEachIndexed { index, it ->
         sb.append(it.name)
         if (index != channels.size - 1) {
             sb.append(",")
@@ -24,15 +24,15 @@ private fun writeHeader(channels: List<Channel>, writer: BufferedWriter) {
     writer.newLine()
 }
 
-private fun writeData(channels: List<Channel>, writer: BufferedWriter) {
+private fun writeData(channels: LinkedHashMap<String, Channel>, writer: BufferedWriter) {
     val sb = StringBuilder()
-    val maxDataCount = channels.maxBy { it.data_count }.data_count
+    val maxDataCount = channels.values.maxBy { it.data_count }.data_count
 
     for (i in 0 until maxDataCount) {
         sb.append(i + 1)
         sb.append(",")
 
-        for ((index, chann) in channels.withIndex()) {
+        for ((index, chann) in channels.values.withIndex()) {
             sb.append(chann.data.getOrNull(i) ?: "")
             if (index != channels.size - 1) {
                 sb.append(",")

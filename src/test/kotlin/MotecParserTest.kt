@@ -1,33 +1,26 @@
+import ChannelName.GEAR
 import Datatype.I32
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertDoesNotThrow
 import java.io.FileNotFoundException
+import kotlin.test.assertNotNull
 
 class MotecParserTest {
 
-    private val motecParser = MotecParser()
+    private lateinit var motecParser: MotecParser
     private val fileName = "sample.ld"
 
     @Test
     fun shouldFailIfFileDoesNotExist() {
         assertThrows(FileNotFoundException::class.java) {
-            val file = "fileDoesNotExist.ld"
-            motecParser.parseFile(file)
-        }
-    }
-
-    @Test
-    fun shouldNotThrowIfFileWasFound() {
-        assertDoesNotThrow {
-            motecParser.parseFile(fileName)
+            MotecParser("fileDoesNotExist.ld")
         }
     }
 
     @Test
     fun shouldParseHeader() {
-        motecParser.parseFile(fileName)
+        motecParser = MotecParser(fileName)
         val header = motecParser.header
 
         assertEquals(64, header.ldmarker)
@@ -65,7 +58,7 @@ class MotecParserTest {
 
     @Test
     fun shouldParseEvent() {
-        motecParser.parseFile(fileName)
+        motecParser = MotecParser(fileName)
         val event = motecParser.event
 
         kotlin.test.assertEquals("Test", event.name)
@@ -76,7 +69,7 @@ class MotecParserTest {
 
     @Test
     fun shouldParseVenue() {
-        motecParser.parseFile(fileName)
+        motecParser = MotecParser(fileName)
         val venue = motecParser.venue
         assertEquals("barcelona gp", venue.name)
         assertEquals(1034, venue.unknown1.size)
@@ -85,7 +78,7 @@ class MotecParserTest {
 
     @Test
     fun shouldParseVehicle() {
-        motecParser.parseFile(fileName)
+        motecParser = MotecParser(fileName)
         val vehicle = motecParser.vehicle
         assertEquals("lamborghinievogt3", vehicle.id)
         assertEquals(128, vehicle.unknown1.size)
@@ -96,20 +89,20 @@ class MotecParserTest {
 
     @Test
     fun shouldParseChannels() {
-        motecParser.parseFile(fileName)
+        motecParser = MotecParser(fileName)
         val channels = motecParser.channels
         assertEquals(330, channels.size)
     }
 
     @Test
     fun shouldParseChannelOneByOne() {
-        motecParser.parseFile(fileName)
-        val channelOne = motecParser.channels[0]
+        motecParser = MotecParser(fileName)
+        val channelOne = motecParser.channels[ChannelName.MANIFOLD_PRES.varName]!!
         assertEquals(0, channelOne.prev_addr)
         assertEquals(13508, channelOne.next_addr)
         assertEquals(54304, channelOne.data_addr)
         assertEquals(6420, channelOne.data_count)
-        assertEquals(6420, channelOne.data_count)
+        assertEquals(6420, channelOne.data.size)
         assertEquals(3, channelOne.unknown1)
         assertEquals(5, channelOne.datatype_type)
         assertEquals(4, channelOne.datatype_size)
@@ -126,9 +119,9 @@ class MotecParserTest {
     }
 
     @Test
-    fun shouldParseChannelData() {
-        motecParser.parseFile(fileName)
-        val channelOne = motecParser.channels[0]
-        assertEquals(6420, channelOne.data.size)
+    fun shouldRetrieveChannelByName() {
+        val parser = MotecParser(fileName)
+        val channel = parser.getChannel(GEAR)
+        assertNotNull(channel)
     }
 }

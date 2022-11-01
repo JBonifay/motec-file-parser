@@ -10,15 +10,20 @@ import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.nio.charset.StandardCharsets
 
-class MotecParser {
+class MotecParser(fileName: String) {
 
-    lateinit var header: Header
-    lateinit var event: Event
-    lateinit var venue: Venue
-    lateinit var vehicle: Vehicle
-    lateinit var channels: MutableList<Channel>
+    var header: Header
+        private set
+    var event: Event
+        private set
+    var venue: Venue
+        private set
+    var vehicle: Vehicle
+        private set
+    var channels: LinkedHashMap<String, Channel>
+        private set
 
-    fun parseFile(fileName: String) {
+    init {
         val buffer = createBuffer(fileName)
 
         header = parseHeader(buffer)
@@ -69,10 +74,6 @@ class MotecParser {
     )
 
     private fun parseEvent(buffer: ByteBuffer): Event {
-        if (!::header.isInitialized) {
-            parseHeader(buffer)
-        }
-
         return Event(
             readString(64, buffer),
             readString(64, buffer),
@@ -102,13 +103,14 @@ class MotecParser {
         )
     }
 
-    private fun parseChannels(buffer: ByteBuffer): MutableList<Channel> {
-        val channels = mutableListOf<Channel>()
+    private fun parseChannels(buffer: ByteBuffer): LinkedHashMap<String, Channel> {
+        val channels = LinkedHashMap<String, Channel>()
+
         var addr = header.channel_meta_ptr
         while (addr != 0) {
             val channel = parseChannel(buffer, addr)
             addr = channel.next_addr
-            channels.add(channel)
+            channels[channel.name] = channel
         }
         return channels
     }
@@ -144,15 +146,15 @@ class MotecParser {
     }
 
     private fun parseChannelsData(buffer: ByteBuffer) {
-        for (channel in channels) {
+        for (channel in channels.values) {
             buffer.position(channel.data_addr)
 
             for (i in 0 until channel.data_count) {
                 when (channel.datatype) {
-                    BEACON16, I16 -> channel.data.add(buffer.getShort())
+                    BEACON16, I16 -> channel.data.add(buffer.getShort().toInt())
                     BEACON32, I32 -> channel.data.add(buffer.getInt())
                     F16 -> TODO()
-                    F32 -> channel.data.add(buffer.getFloat())
+                    F32 -> channel.data.add(buffer.getFloat().toInt())
                     INVALID -> TODO()
                 }
             }
@@ -169,5 +171,9 @@ class MotecParser {
         val tmp = ByteArray(size)
         bb.get(tmp)
         return String(tmp, StandardCharsets.UTF_8).replace(0.toChar().toString(), "")
+    }
+
+    fun getChannel(channelName: ChannelName): Channel {
+        return channels[channelName.varName]!!
     }
 }
