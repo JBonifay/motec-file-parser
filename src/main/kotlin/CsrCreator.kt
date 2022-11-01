@@ -1,3 +1,4 @@
+import model.Channel
 import java.io.BufferedWriter
 import java.io.OutputStream
 

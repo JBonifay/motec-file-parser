@@ -1,3 +1,5 @@
+package model
+
 data class Event(
     val name: String,
     val session: String,

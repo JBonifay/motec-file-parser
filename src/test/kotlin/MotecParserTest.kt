@@ -1,5 +1,6 @@
-import ChannelName.GEAR
-import Datatype.I32
+import model.ChannelName
+import model.ChannelName.GEAR
+import model.Datatype.I32
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Test

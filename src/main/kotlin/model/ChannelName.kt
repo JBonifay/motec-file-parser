@@ -1,3 +1,5 @@
+package model
+
 enum class ChannelName(val varName: String) {
 
     MANIFOLD_PRES("Manifold Pres"),

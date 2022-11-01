@@ -1,3 +1,5 @@
+package model
+
 data class Vehicle(
     val id: String,
     val unknown1: ByteArray,

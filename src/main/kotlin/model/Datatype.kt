@@ -1,3 +1,5 @@
+package model
+
 enum class Datatype {
     BEACON16, BEACON32, I16, I32, F16, F32, INVALID;
 

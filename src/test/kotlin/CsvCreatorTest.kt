@@ -1,4 +1,5 @@
-import Datatype.INVALID
+import model.Channel
+import model.Datatype.INVALID
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import java.io.ByteArrayOutputStream

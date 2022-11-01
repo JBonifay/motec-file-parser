@@ -1,3 +1,5 @@
+package model
+
 data class Header(
     val ldmarker: Int,
     val unknown1: Int,

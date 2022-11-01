@@ -1,3 +1,5 @@
+package model
+
 data class Channel(
     val prev_addr: Int,
     val next_addr: Int,
